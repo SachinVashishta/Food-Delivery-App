@@ -4,7 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import './RestaurantDashboard.css';
 
-const API_BASE = 'http://localhost:3500/api';
+const API = import.meta.env.VITE_API;
+const API_BASE = API || 'http://localhost:3500/api';
 const STATUS_OPTIONS = ['Pending', 'Confirmed', 'Cooking', 'Out for Delivery', 'Delivered'];
 
 const RestaurantDashboard = () => {

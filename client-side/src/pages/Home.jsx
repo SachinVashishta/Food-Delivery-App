@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import './Home.css';
-
-const API_BASE = 'http://localhost:3500/api';
+const API = import.meta.env.VITE_API;
+const API_BASE = API || 'http://localhost:3500/api';
 
 const Home = () => {
   const [restaurants, setRestaurants] = useState([]);

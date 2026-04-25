@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import './Restaurant.css';
 
-const API_BASE = 'http://localhost:3500/api';
+const API = import.meta.env.VITE_API;
+const API_BASE = API || 'http://localhost:3500/api';
 
 const Restaurant = () => {
   const { id } = useParams();
