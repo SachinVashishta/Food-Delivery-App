@@ -1,0 +1,267 @@
+.track-page {
+  min-height: calc(100vh - 60px);
+  background-color: #f8f9fa;
+  padding: 24px 16px;
+}
+
+.track-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.track-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.track-order-id {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+.track-loading,
+.track-error {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.track-error {
+  color: #dc2626;
+}
+
+.track-status-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.track-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.track-status-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.track-polling-status {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.track-progress {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+}
+
+.track-progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.track-progress-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid;
+  background-color: #ffffff;
+  z-index: 1;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.track-progress-dot.active {
+  background-color: currentColor;
+}
+
+.track-progress-line {
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  width: 100%;
+  height: 3px;
+  background-color: #e5e7eb;
+  z-index: 0;
+  transition: background-color 0.3s ease;
+}
+
+.track-progress-line.active {
+  background-color: #10b981;
+}
+
+.track-progress-label {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-align: center;
+  transition: color 0.3s ease;
+}
+
+.track-progress-label.active {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.track-details {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.track-section-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 14px;
+}
+
+.track-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.track-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  color: #4b5563;
+}
+
+.track-item-name {
+  flex: 1;
+}
+
+.track-item-price {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.track-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 2px solid #e5e7eb;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.track-payment-info {
+  margin-bottom: 14px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.track-payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.track-payment-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.track-payment-badge.status-completed {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.track-payment-badge.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.track-payment-badge.status-failed {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.track-payment-id {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.track-address {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.track-address strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #1f2937;
+}
+
+.track-address p {
+  margin: 0;
+}
+
+.track-map-section {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.track-map-fallback {
+  height: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+  border-radius: 12px;
+  color: #6b7280;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 24px;
+}
+
+.track-map-fallback code {
+  background: #e5e7eb;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
