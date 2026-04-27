@@ -72,5 +72,31 @@ const updateFoodItem = async (req, res) => {
   }
 };
 
-module.exports = { createFoodItem, updateFoodItem };
+const deleteFoodItem = async (req, res) => {
+  try {
+    const foodItem = await FoodItem.findById(req.params.id);
+    if (!foodItem) {
+      return res.status(404).json({ message: 'Food item not found' });
+    }
+
+    // Verify the food item's restaurant belongs to the logged-in owner
+    const existingRestaurant = await Restaurant.findById(foodItem.restaurant);
+    if (!existingRestaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+
+    if (req.user.role !== 'admin' && existingRestaurant.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Access denied: You do not own this restaurant' });
+    }
+
+    await FoodItem.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: 'Food item deleted successfully' });
+  } catch (error) {
+    console.error('Delete food item error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { createFoodItem, updateFoodItem, deleteFoodItem };
 

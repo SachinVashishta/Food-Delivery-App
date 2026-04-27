@@ -5,7 +5,7 @@ import axios from 'axios';
 import './UserProfile.css';
 
 const API = import.meta.env.VITE_API;
-const API_BASE = API ||'http://localhost:3500/api';
+const API_BASE = API || 'http://localhost:3500/api';
 
 const UserProfile = () => {
   const { user } = useAuth();

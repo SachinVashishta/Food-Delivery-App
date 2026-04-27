@@ -1,21 +1,31 @@
-# User Profile & Admin Dashboard Enhancement - TODO
+# Fix & Responsive Plan
 
-## Backend Tasks
+## Critical Errors
 
-- [x] 1. Update `authController.js` - add `getProfile` and `updateProfile` controllers
-- [x] 2. Update `auth.js` routes - add `GET /profile` and `PUT /profile`
-- [x] 3. Update `paymentController.js` - add `getPaymentHistory` and `getAllPayments`
-- [x] 4. Update `payment.js` routes - add `GET /history` and `GET /all`
+- [ ] RestaurantDashboard.jsx is truncated (565 lines, ends mid-modal). Must reconstruct entire file.
+- [ ] Cart.css class names don't match Cart.jsx (cart-page vs cart-container, etc.)
+- [ ] Restaurant.css is empty — Restaurant.jsx has no styles.
 
-## Frontend Tasks
+## Responsiveness Tasks
 
-- [x] 5. Create `UserProfile.jsx` page with Orders & Payments tabs
-- [x] 6. Create `UserProfile.css` styles
-- [x] 7. Update `App.jsx` - add `/profile` route
-- [x] 8. Update `Navbar.jsx` - add Profile link
-- [x] 9. Update `RestaurantDashboard.jsx` - add "All Orders" and "All Payments" admin tabs
-- [x] 10. Update `RestaurantDashboard.css` - add styles for new admin tabs
+- [ ] Navbar: Add hamburger menu for mobile
+- [ ] RestaurantDashboard: Better mobile breakpoints for tables, tabs, modals, grids
+- [ ] Cart: Fix layout + add mobile responsiveness
+- [ ] Restaurant page: Add full styles + responsive grid
+- [ ] Checkout: Mobile padding/font adjustments
+- [ ] Auth: Reduce card padding on mobile
+- [ ] TrackOrder: Wrap progress steps, reduce map height on mobile
+- [ ] Home: Minor mobile tweaks
 
-## Verification
+## Files to Edit
 
-- [x] 11. All endpoints and UI flows implemented
+1. client-side/src/pages/RestaurantDashboard.jsx — reconstruct
+2. client-side/src/pages/RestaurantDashboard.css — add responsive rules
+3. client-side/src/pages/Cart.css — fix class names + responsive
+4. client-side/src/pages/Restaurant.css — create full styles
+5. client-side/src/components/Navbar.jsx — add mobile toggle
+6. client-side/src/components/Navbar.css — mobile menu styles
+7. client-side/src/pages/Checkout.css — mobile tweaks
+8. client-side/src/pages/Auth.css — mobile tweaks
+9. client-side/src/pages/TrackOrder.css — mobile tweaks
+10. client-side/src/pages/Home.css — minor mobile tweaks

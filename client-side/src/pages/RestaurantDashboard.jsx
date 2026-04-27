@@ -35,6 +35,8 @@ const RestaurantDashboard = () => {
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [restaurantForm, setRestaurantForm] = useState({ name: '', image: '', location: '', cuisine: '', rating: '' });
   const [foodForm, setFoodForm] = useState({ name: '', price: '', image: '', description: '' });
+  const [showManageMenuModal, setShowManageMenuModal] = useState(false);
+  const [manageMenuRestaurant, setManageMenuRestaurant] = useState(null);
 
   const [activeTab, setActiveTab] = useState('menu');
   const [restaurant, setRestaurant] = useState(null);
@@ -227,6 +229,24 @@ const RestaurantDashboard = () => {
     }
   };
 
+  const handleDeleteFood = async (foodId) => {
+    if (!window.confirm('Are you sure you want to delete this food item?')) return;
+    try {
+      await axiosInstance.delete(`/foods/${foodId}`);
+      setFoods(prev => prev.filter(f => f._id !== foodId));
+      showMessage('Food item deleted');
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to delete food item');
+    }
+  };
+
+  const openManageMenuModal = async (rest) => {
+    setManageMenuRestaurant(rest);
+    setShowManageMenuModal(true);
+    setError(null);
+    await fetchFoods(rest._id);
+  };
+
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       const res = await axiosInstance.put(`/orders/${orderId}/status`, { status: newStatus });
@@ -281,11 +301,18 @@ const RestaurantDashboard = () => {
     { id: 'allPayments', label: 'All Payments' },
   ];
 
+  const OWNER_TABS = [
+    { id: 'menu', label: 'My Menu' },
+    { id: 'add', label: 'Add Food' },
+    { id: 'orders', label: 'Orders' },
+  ];
+
   const formatDate = (dateStr) => {
     if (!dateStr) return 'N/A';
     return new Date(dateStr).toLocaleString();
   };
 
+  /* ─────────── Admin Dashboard ─────────── */
   if (user.role === 'admin') {
     return (
       <div className="dashboard-container">
@@ -340,9 +367,14 @@ const RestaurantDashboard = () => {
                           <td>{rest.cuisine?.length > 0 ? rest.cuisine.join(', ') : 'N/A'}</td>
                           <td><span className="rating-badge">{rest.rating || 0} ★</span></td>
                           <td>
-                            <button className="btn-secondary btn-sm" onClick={() => openAddFoodModal(rest)}>
-                              Add Food
-                            </button>
+                            <div className="admin-row-actions">
+                              <button className="btn-secondary btn-sm" onClick={() => openAddFoodModal(rest)}>
+                                Add Food
+                              </button>
+                              <button className="btn-secondary btn-sm" onClick={() => openManageMenuModal(rest)}>
+                                Manage Menu
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -457,6 +489,7 @@ const RestaurantDashboard = () => {
           )}
         </div>
 
+        {/* Add Restaurant Modal */}
         {showAddRestaurantModal && (
           <div className="modal-overlay" onClick={() => setShowAddRestaurantModal(false)}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -479,36 +512,33 @@ const RestaurantDashboard = () => {
                 </div>
                 <div className="form-group">
                   <label>Location *</label>
-                  <input type="text" value={restaurantForm.location}
+                  <input type="text" value={ restaurantForm.location} 
                     onChange={e => setRestaurantForm({ ...restaurantForm, location: e.target.value })}
-                    required placeholder="e.g. Sector 18, Noida" />
+                    required placeholder="e.g. Downtown, City" />
                 </div>
                 <div className="form-group">
-                  <label>Cuisine (comma separated)</label>
+                  <label>Cuisine Types (comma separated)</label>
                   <input type="text" value={restaurantForm.cuisine}
                     onChange={e => setRestaurantForm({ ...restaurantForm, cuisine: e.target.value })}
-                    placeholder="e.g. Indian, Chinese" />
+                    placeholder="e.g. Indian, Chinese, Fast Food" />
                 </div>
                 <div className="form-group">
-                  <label>Rating</label>
+                  <label>Rating (0-5)</label>
                   <input type="number" value={restaurantForm.rating}
                     onChange={e => setRestaurantForm({ ...restaurantForm, rating: e.target.value })}
-                    placeholder="0-5" min="0" max="5" step="0.1" />
+                    min="0" max="5" step="0.1" placeholder="e.g. 4.5" />
                 </div>
-                <div className="modal-actions">
-                  <button type="button" className="btn-secondary" onClick={() => setShowAddRestaurantModal(false)}>Cancel</button>
-                  <button type="submit" className="btn-primary">Add Restaurant</button>
-                </div>
+                <button type="submit" className="btn-primary">Add Restaurant</button>
               </form>
             </div>
           </div>
         )}
-
+        {/* Add Food Modal */}
         {showAddFoodModal && selectedRestaurant && (
           <div className="modal-overlay" onClick={() => setShowAddFoodModal(false)}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
               <div className="modal-header">
-                <h3>Add Food to {selectedRestaurant.name}</h3>
+                <h3>Add Food Item to {selectedRestaurant.name}</h3>
                 <button className="modal-close" onClick={() => setShowAddFoodModal(false)}>×</button>
               </div>
               <form onSubmit={handleAddFood} className="modal-form">
@@ -522,7 +552,7 @@ const RestaurantDashboard = () => {
                   <label>Price (₹) *</label>
                   <input type="number" value={foodForm.price}
                     onChange={e => setFoodForm({ ...foodForm, price: e.target.value })}
-                    required placeholder="e.g. 199" />
+                    required placeholder="e.g. 250" />
                 </div>
                 <div className="form-group">
                   <label>Image URL</label>
@@ -534,12 +564,283 @@ const RestaurantDashboard = () => {
                   <label>Description</label>
                   <textarea value={foodForm.description}
                     onChange={e => setFoodForm({ ...foodForm, description: e.target.value })}
-                    placeholder="Short description..." rows={3} />
+                    placeholder="A delicious dish that you'll love!">
+                  </textarea>
                 </div>
-                <div className="modal-actions">
-                  <button type="button" className="btn-secondary" onClick={() => setShowAddFoodModal(false)}>Cancel</button>
-                  <button type="submit" className="btn-primary">Add Food</button>
+                <button type="submit" className="btn-primary">Add Food Item</button>
+              </form>
+            </div>
+          </div>
+        )}
+        {/* Manage Menu Modal */}
+        {showManageMenuModal && manageMenuRestaurant && (
+          <div className="modal-overlay" onClick={() => setShowManageMenuModal(false)}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Manage Menu for {manageMenuRestaurant.name}</h3>
+                <button className="modal-close" onClick={() => setShowManageMenuModal(false)}>×</button>
+              </div>
+              <div className="menu-management">
+                {foods.length === 0 ? (
+                  <p className="empty-state">No food items found for this restaurant.</p>
+                ) : (
+                  <div className="table-wrapper">
+                    <table className="data-table">
+                      <thead>
+                        <tr><th>Image</th><th>Name</th><th>Price</th><th>Category</th><th>Description</th><th>Available</th><th>Actions</th></tr>
+                      </thead>
+                      <tbody>
+                        {foods.map(food => (
+                          <tr key={food._id}>
+                            <td>
+                              {food.image ? (
+                                <img src={food.image} alt={food.name} className="table-thumb" />
+                              ) : (
+                                <div className="table-thumb-placeholder">{food.name?.[0]}</div>
+                              )}
+                            </td>
+                            <td className="cell-name">{food.name}</td>
+                            <td>₹{food.price}</td>
+                            <td>{food.category || 'N/A'}</td>
+                            <td>{food.description || 'N/A'}</td>
+                            <td>
+                              <span className={`availability-badge ${food.isAvailable ? 'available' : 'unavailable'}`}>
+                                {food.isAvailable ? 'Available' : 'Unavailable'}
+                              </span>
+                            </td>
+                            <td>
+                              <button className="btn-secondary btn-sm" onClick={() => handleToggleAvailable(food)}>
+                                {food.isAvailable ? 'Mark Unavailable' : 'Mark Available'}
+                              </button>
+                              <button className="btn-secondary btn-sm" onClick={() => startEdit(food)}>
+                                Edit
+                              </button>
+                              <button className="btn-danger btn-sm" onClick={() => handleDeleteFood(food._id)}>
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+
+  }
+  /* ─────────── Restaurant Owner Dashboard ─────────── */
+  else if (user.role === 'restaurant') {
+    return (
+      <div className="dashboard-container">
+        <h1 className="dashboard-title">My Restaurant Dashboard</h1>
+        <p className="dashboard-subtitle">Manage your menu and orders</p>
+        {message && <div className="dashboard-message success">{message}</div>}
+        {error && <div className="dashboard-message error">{error}</div>}
+        <div className="dashboard-tabs">
+          {OWNER_TABS.map(tab => (
+            <button
+              key={tab.id}
+              className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <div className="dashboard-content">
+          {loading && <div className="dashboard-loading">Loading...</div>}
+          {activeTab === 'menu' && !loading && (
+            <div className="menu-tab">
+              {foods.length === 0 ? (
+                <p className="empty-state">No food items found. Add your first food item in the "Add Food" tab.</p>
+              ) : (
+            <div className="table-wrapper">                                  
+              <table className="data-table">
+                <thead>
+                  <tr><th>Image</th><th>Name</th><th>Price</th><th>Category</th><th>Description</th><th>Available</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                  {foods.map(food => (
+                    <tr key={food._id}>
+                      <td>
+                        {food.image ? (
+                          <img src={food.image} alt={food.name} className="table-thumb" />
+                        ) : (
+                          <div className="table-thumb-placeholder">{food.name?.[0]}</div>
+                        )}
+                      </td>
+                      <td className="cell-name">{food.name}</td>
+                      <td>₹{food.price}</td>
+                      <td>{food.category || 'N/A'}</td>
+                      <td>{food.description || 'N/A'}</td>
+                      <td>
+                        <span className={`availability-badge ${food.isAvailable ? 'available' : 'unavailable'}`}>
+                          {food.isAvailable ? 'Available' : 'Unavailable'}
+                        </span>
+                      </td>
+                      <td>
+                        <button className="btn-secondary btn-sm" onClick={() => handleToggleAvailable(food)}>
+                          {food.isAvailable ? 'Mark Unavailable' : 'Mark Available'}
+                        </button>
+                        <button className="btn-secondary btn-sm" onClick={() => startEdit(food)}>
+                          Edit
+                        </button>
+                        <button className="btn-danger btn-sm" onClick={() => handleDeleteFood(food._id)}>
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+              )}
+            </div>
+          )}
+          {activeTab === 'add' && !loading && (
+            <div className="add-food-tab">
+              <form onSubmit={handleAddFoodOwner} className="add-food-form">
+                <div className="form-group">
+                  <label>Food Name *</label>
+                  <input type="text" value={addForm.name}
+                    onChange={e => setAddForm({ ...addForm, name: e.target.value })}
+                    required placeholder="e.g. Chicken Biryani" />
                 </div>
+                <div className="form-group">
+                  <label>Price (₹) *</label>
+                  <input type="number" value={addForm.price}
+                    onChange={e => setAddForm({ ...addForm, price: e.target.value })}
+                    required placeholder="e.g. 250" />
+                </div>
+                <div className="form-group">
+                  <label>Image URL</label>
+                  <input type="text" value={addForm.image}
+                    onChange={e => setAddForm({ ...addForm, image: e.target.value })}
+                    placeholder="https://..." />
+                </div>
+                <div className="form-group">
+                  <label>Category</label>
+                  <input type="text" value={addForm.category}
+                    onChange={e => setAddForm({ ...addForm, category: e.target.value })}
+                    placeholder="e.g. Main Course, Appetizer" />
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea value={addForm.description}
+                    onChange={e => setAddForm({ ...addForm, description: e.target.value })}
+                    placeholder="Enter food description..." />
+                </div>
+                <button type="submit" className="btn-primary">
+                  Add Food
+                </button>
+              </form>
+            </div>
+          )}
+          {activeTab === 'orders' && !loading && (
+            <div className="orders-tab">
+              {orders.length === 0 ? (
+                <p className="empty-state">No orders found.</p>
+              ) : (
+                <div className="orders-table-wrapper">
+                  <table className="orders-table">
+                    <thead>
+                      <tr>
+                        <th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Update Status</th><th>Payment</th><th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orders.map(order => (
+                        <tr key={order._id}>
+                          <td className="order-id">{order._id.slice(-6).toUpperCase()}</td>
+                          <td>
+                            <div className="customer-info">
+                              <span className="customer-name">{order.user?.name ||  'Unknown Customer'}</span>
+                              <span className="customer-email">{order.user?.email || ''}</span>
+                            </div>
+                          </td>
+                          <td>
+                            <ul className="order-items-list">
+                              {order.items?.map((item, idx) => (
+                                <li key={idx}>{item.food?.name || 'Unknown'} x{item.qty}</li>
+                              ))}
+                            </ul>
+                          </td>
+                          <td className="order-total">₹{order.totalAmount}</td>
+                          <td>
+                            <span className={`status-badge status-${order.status?.replace(/\s+/g, '-').toLowerCase()}`}>
+                              {order.status}
+                            </span>
+                          </td>
+                          <td>
+                            <select className="status-select"
+                              value={order.status}
+                              onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                            >
+                              {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                          </td>
+                          <td>
+                            <span className={`payment-status status-${order.payment?.status?.toLowerCase()}`}>
+                              {order.payment?.status || 'Pending'}
+                            </span>
+                          </td>
+                          <td>{formatDate(order.createdAt)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        {/* Edit Food Modal */}
+        {editingId && (
+          <div className="modal-overlay" onClick={() => setEditingId(null)}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Edit Food Item</h3>
+                <button className="modal-close" onClick={() => setEditingId(null)}>×</button>
+              </div>
+              <form onSubmit={(e) => { e.preventDefault(); handleSaveEdit(editingId); }} className="modal-form">
+                <div className="form-group">
+                  <label>Food Name *</label>
+                  <input type="text" value={editForm.name}
+                    onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                    required placeholder="e.g. Chicken Biryani" />
+                </div>
+                <div className="form-group">
+                  <label>Price (₹) *</label>
+                  <input type="number" value={editForm.price}
+                    onChange={e => setEditForm({ ...editForm, price: e.target.value })}
+                    required placeholder="e.g. 250" />
+                </div>
+                <div className="form-group">
+                  <label>Image URL</label>
+                  <input type="text" value={editForm.image}
+                    onChange={e => setEditForm({ ...editForm, image: e.target.value })}
+                    placeholder="https://..." />
+                </div>
+                <div className="form-group">
+                  <label>Category</label>
+                  <input type="text" value={editForm.category}
+                    onChange={e => setEditForm({ ...editForm, category: e.target.value })}
+                    placeholder="e.g. Main Course, Appetizer" />
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea value={editForm.description}
+                    onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                    placeholder="Enter food description..." />
+                </div>
+                <button type="submit" className="btn-primary">
+                  Save Changes
+                </button>
               </form>
             </div>
           </div>
@@ -547,179 +848,7 @@ const RestaurantDashboard = () => {
       </div>
     );
   }
-
-  return (
-    <div className="dashboard-container">
-      <h1 className="dashboard-title">{restaurant?.name || 'My Restaurant'}</h1>
-      <p className="dashboard-subtitle">Manage your menu, orders &amp; settings</p>
-
-      {message && <div className="dashboard-message success">{message}</div>}
-      {error && <div className="dashboard-message error">{error}</div>}
-
-      <div className="dashboard-tabs">
-        {[
-          { id: 'menu', label: 'Menu' },
-          { id: 'orders', label: 'Orders' },
-          { id: 'addFood', label: 'Add Food' },
-        ].map(tab => (
-          <button
-            key={tab.id}
-            className={`dashboard-tab ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => { setActiveTab(tab.id); setError(null); }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="dashboard-content">
-        {loading && <div className="dashboard-loading">Loading...</div>}
-
-        {activeTab === 'menu' && !loading && (
-          <div className="menu-tab">
-            {foods.length === 0 ? (
-              <p className="empty-state">No food items yet. Add your first item from the Add Food tab.</p>
-            ) : (
-              <div className="food-grid">
-                {foods.map(food => (
-                  <div key={food._id} className="food-card">
-                    {food.image ? (
-                      <img src={food.image} alt={food.name} className="food-image" />
-                    ) : (
-                      <div className="food-image-placeholder">{food.name?.[0]}</div>
-                    )}
-                    <div className="food-info">
-                      {editingId === food._id ? (
-                        <>
-                          <input type="text" value={editForm.name}
-                            onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
-                          <input type="number" value={editForm.price}
-                            onChange={e => setEditForm({ ...editForm, price: e.target.value })} />
-                          <input type="text" value={editForm.image}
-                            onChange={e => setEditForm({ ...editForm, image: e.target.value })}
-                            placeholder="Image URL" />
-                          <input type="text" value={editForm.category}
-                            onChange={e => setEditForm({ ...editForm, category: e.target.value })}
-                            placeholder="Category" />
-                          <textarea value={editForm.description}
-                            onChange={e => setEditForm({ ...editForm, description: e.target.value })}
-                            placeholder="Description" rows={2} />
-                          <div className="food-actions">
-                            <button className="btn-primary btn-sm" onClick={() => handleSaveEdit(food._id)}>Save</button>
-                            <button className="btn-secondary btn-sm" onClick={() => setEditingId(null)}>Cancel</button>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <h4>{food.name}</h4>
-                          <p className="food-price">₹{food.price}</p>
-                          {food.category && <p className="food-category">{food.category}</p>}
-                          {food.description && <p className="food-desc">{food.description}</p>}
-                          <div className="food-actions">
-                            <button className="btn-secondary btn-sm" onClick={() => startEdit(food)}>Edit</button>
-                            <button
-                              className={`btn-sm ${food.isAvailable ? 'btn-success' : 'btn-danger'}`}
-                              onClick={() => handleToggleAvailable(food)}
-                            >
-                              {food.isAvailable ? 'Available' : 'Unavailable'}
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'orders' && !loading && (
-          <div className="orders-tab">
-            {orders.length === 0 ? (
-              <p className="empty-state">No orders yet.</p>
-            ) : (
-              <div className="orders-list">
-                {orders.map(order => (
-                  <div key={order._id} className="order-card">
-                    <div className="order-header">
-                      <span className="order-id">Order #{order._id.slice(-6).toUpperCase()}</span>
-                      <span className={`status-badge status-${order.status?.replace(/\s+/g, '-').toLowerCase()}`}>
-                        {order.status}
-                      </span>
-                    </div>
-                    <div className="order-details">
-                      <p><strong>Customer:</strong> {order.user?.name || 'N/A'} ({order.user?.email || ''})</p>
-                      <p><strong>Total:</strong> ₹{order.totalAmount}</p>
-                      <p><strong>Date:</strong> {formatDate(order.createdAt)}</p>
-                      <div className="order-items">
-                        <strong>Items:</strong>
-                        <ul>
-                          {order.items?.map((item, idx) => (
-                            <li key={idx}>{item.food?.name || 'Unknown'} x{item.qty}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="order-actions">
-                        <label>Update Status:</label>
-                        <select
-                          className="status-select"
-                          value={order.status}
-                          onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                        >
-                          {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'addFood' && (
-          <div className="add-food-tab">
-            <h3>Add New Food Item</h3>
-            <form onSubmit={handleAddFoodOwner} className="add-food-form">
-              <div className="form-group">
-                <label>Name *</label>
-                <input type="text" value={addForm.name}
-                  onChange={e => setAddForm({ ...addForm, name: e.target.value })}
-                  required placeholder="e.g. Paneer Tikka" />
-              </div>
-              <div className="form-group">
-                <label>Price (₹) *</label>
-                <input type="number" value={addForm.price}
-                  onChange={e => setAddForm({ ...addForm, price: e.target.value })}
-                  required placeholder="e.g. 249" />
-              </div>
-              <div className="form-group">
-                <label>Image URL</label>
-                <input type="text" value={addForm.image}
-                  onChange={e => setAddForm({ ...addForm, image: e.target.value })}
-                  placeholder="https://..." />
-              </div>
-              <div className="form-group">
-                <label>Category</label>
-                <input type="text" value={addForm.category}
-                  onChange={e => setAddForm({ ...addForm, category: e.target.value })}
-                  placeholder="e.g. Starter, Main Course" />
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <textarea value={addForm.description}
-                  onChange={e => setAddForm({ ...addForm, description: e.target.value })}
-                  placeholder="Short description..." rows={3} />
-              </div>
-              <button type="submit" className="btn-primary">Add Food Item</button>
-            </form>
-          </div>
-        )}
-      </div>
-    </div>
-  );
 };
-
+ 
+  
 export default RestaurantDashboard;
-
