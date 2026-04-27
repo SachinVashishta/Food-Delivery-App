@@ -34,7 +34,7 @@ const Navbar = () => {
       <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
         {user ? (
           <>
-            <span className="navbar-user">Hello, {user.name}</span>
+            
             <Link to="/profile" className="navbar-link" onClick={closeMenu}>Profile</Link>
             {(user.role === 'restaurant' || user.role === 'admin') && (
               <Link to="/restaurant/dashboard" className="navbar-link" onClick={closeMenu}>Dashboard</Link>
