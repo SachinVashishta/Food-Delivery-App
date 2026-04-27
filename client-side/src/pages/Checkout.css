@@ -142,3 +142,37 @@
   cursor: not-allowed;
 }
 
+/* ─────────── Responsive ─────────── */
+@media (max-width: 640px) {
+  .checkout-page {
+    padding: 16px 12px;
+  }
+
+  .checkout-container {
+    padding: 20px 16px;
+    border-radius: 10px;
+  }
+
+  .checkout-title {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+  }
+
+  .checkout-section-title {
+    font-size: 1rem;
+  }
+
+  .checkout-item {
+    font-size: 0.9rem;
+  }
+
+  .checkout-total {
+    font-size: 1rem;
+  }
+
+  .checkout-pay-btn {
+    font-size: 1rem;
+    padding: 12px;
+  }
+}
+

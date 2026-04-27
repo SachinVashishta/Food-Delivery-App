@@ -265,3 +265,67 @@
   font-size: 0.8rem;
 }
 
+/* ─────────── Responsive ─────────── */
+@media (max-width: 768px) {
+  .track-page {
+    padding: 16px 12px;
+  }
+
+  .track-title {
+    font-size: 1.4rem;
+  }
+
+  .track-status-card,
+  .track-details,
+  .track-map-section {
+    padding: 16px;
+  }
+
+  .track-status-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .track-progress-step {
+    flex: 1;
+  }
+
+  .track-progress-label {
+    font-size: 0.65rem;
+  }
+
+  .track-progress-dot {
+    width: 12px;
+    height: 12px;
+    border-width: 2px;
+  }
+
+  .track-progress-line {
+    top: 5px;
+    height: 2px;
+  }
+
+  .track-payment-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .track-map-fallback {
+    height: 240px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .track-progress-label {
+    display: none;
+  }
+
+  .track-total {
+    font-size: 1rem;
+  }
+}
+

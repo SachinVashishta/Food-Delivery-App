@@ -22,3 +22,14 @@ button {
   font-family: inherit;
 }
 
+/* Touch-friendly tap targets on mobile */
+@media (max-width: 768px) {
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+}
+
