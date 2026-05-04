@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -45,12 +45,20 @@ const RestaurantDashboard = () => {
   const [addForm, setAddForm] = useState({ name: '', price: '', image: '', category: '', description: '' });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
+  const [currentToken, setCurrentToken] = useState(localStorage.getItem('token'));
+  const axiosInstance = useMemo(() => {
+    return axios.create({
+      baseURL: API_BASE,
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${currentToken || ''}` },
+    });
+  }, [currentToken]);
 
-  const token = localStorage.getItem('token');
-  const axiosInstance = axios.create({
-    baseURL: API_BASE,
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-  });
+  useEffect(() => {
+    const newToken = localStorage.getItem('token');
+    if (newToken !== currentToken) {
+      setCurrentToken(newToken);
+    }
+  }, [user, currentToken]);
 
   const showMessage = (msg) => {
     setMessage(msg);
