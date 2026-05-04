@@ -154,10 +154,11 @@ const RestaurantDashboard = () => {
 
   const fetchFoods = async (restaurantId) => {
     try {
-      const res = await axios.get(`${API_BASE}/restaurants/${restaurantId}`);
+      const res = await axiosInstance.get(`/restaurants/${restaurantId}`);
       setFoods(res.data?.foods || []);
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to fetch menu');
+      setError(err.response?.data?.message || err.message || 'Failed to fetch menu items');
+      setFoods([]);
     }
   };
 
@@ -311,6 +312,53 @@ const RestaurantDashboard = () => {
     if (!dateStr) return 'N/A';
     return new Date(dateStr).toLocaleString();
   };
+
+  {/* Edit Food Modal - Shared for Admin and Restaurant Owner */}
+  {editingId && (
+    <div className="modal-overlay" onClick={() => setEditingId(null)}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3>Edit Food Item</h3>
+          <button className="modal-close" onClick={() => setEditingId(null)}>×</button>
+        </div>
+        <form onSubmit={(e) => { e.preventDefault(); handleSaveEdit(editingId); }} className="modal-form">
+          <div className="form-group">
+            <label>Food Name *</label>
+            <input type="text" value={editForm.name}
+              onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+              required placeholder="e.g. Chicken Biryani" />
+          </div>
+          <div className="form-group">
+            <label>Price (₹) *</label>
+            <input type="number" value={editForm.price}
+              onChange={e => setEditForm({ ...editForm, price: e.target.value })}
+              required placeholder="e.g. 250" />
+          </div>
+          <div className="form-group">
+            <label>Image URL</label>
+            <input type="text" value={editForm.image}
+              onChange={e => setEditForm({ ...editForm, image: e.target.value })}
+              placeholder="https://..." />
+          </div>
+          <div className="form-group">
+            <label>Category</label>
+            <input type="text" value={editForm.category}
+              onChange={e => setEditForm({ ...editForm, category: e.target.value })}
+              placeholder="e.g. Main Course, Appetizer" />
+          </div>
+          <div className="form-group">
+            <label>Description</label>
+            <textarea value={editForm.description}
+              onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+              placeholder="Enter food description..." />
+          </div>
+          <button type="submit" className="btn-primary">
+            Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+  )}
 
   /* ─────────── Admin Dashboard ─────────── */
   if (user.role === 'admin') {
@@ -799,52 +847,6 @@ const RestaurantDashboard = () => {
             </div>
           )}
         </div>
-        {/* Edit Food Modal */}
-        {editingId && (
-          <div className="modal-overlay" onClick={() => setEditingId(null)}>
-            <div className="modal-content" onClick={e => e.stopPropagation()}>
-              <div className="modal-header">
-                <h3>Edit Food Item</h3>
-                <button className="modal-close" onClick={() => setEditingId(null)}>×</button>
-              </div>
-              <form onSubmit={(e) => { e.preventDefault(); handleSaveEdit(editingId); }} className="modal-form">
-                <div className="form-group">
-                  <label>Food Name *</label>
-                  <input type="text" value={editForm.name}
-                    onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                    required placeholder="e.g. Chicken Biryani" />
-                </div>
-                <div className="form-group">
-                  <label>Price (₹) *</label>
-                  <input type="number" value={editForm.price}
-                    onChange={e => setEditForm({ ...editForm, price: e.target.value })}
-                    required placeholder="e.g. 250" />
-                </div>
-                <div className="form-group">
-                  <label>Image URL</label>
-                  <input type="text" value={editForm.image}
-                    onChange={e => setEditForm({ ...editForm, image: e.target.value })}
-                    placeholder="https://..." />
-                </div>
-                <div className="form-group">
-                  <label>Category</label>
-                  <input type="text" value={editForm.category}
-                    onChange={e => setEditForm({ ...editForm, category: e.target.value })}
-                    placeholder="e.g. Main Course, Appetizer" />
-                </div>
-                <div className="form-group">
-                  <label>Description</label>
-                  <textarea value={editForm.description}
-                    onChange={e => setEditForm({ ...editForm, description: e.target.value })}
-                    placeholder="Enter food description..." />
-                </div>
-                <button type="submit" className="btn-primary">
-                  Save Changes
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
     );
   }
