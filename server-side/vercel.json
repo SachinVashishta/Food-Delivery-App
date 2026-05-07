@@ -1,0 +1,16 @@
+module.exports = {
+    "version": 2,
+    "build": [
+        {
+            "src":"server.js",
+            "use":"@vercel/node"
+        }
+    ],
+    "routes" : [
+        {
+            "src": "/(.*)",
+            "dest": "/server.js"
+        }
+    ]
+
+}
