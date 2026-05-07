@@ -7,7 +7,7 @@
         "distDir": "dist"
       }
     }
-  ,
+  
   "routes": [
     {
       "src": "/(.*)",
